@@ -23,6 +23,8 @@ while(1):
     else:           
         lower_range  = np.array([134, 20, 204])
         upper_range = np.array([179, 255, 255])
+        #lower_range  = np.array([0, 0, 0])
+        #upper_range = np.array([180, 255, 255])
     mask = cv2.inRange(hsv, lower_range, upper_range)
     mask = cv2.erode(mask,kernel,iterations = 1)
     mask = cv2.dilate(mask,kernel,iterations = 2)

@@ -11,6 +11,14 @@ cap = cv2.VideoCapture(0)
 pen_img = cv2.resize(cv2.imread('pen.png',1), (50, 50))
 eraser_img = cv2.resize(cv2.imread('eraser.png',1), (50, 50))
 
+blue_img = cv2.resize(cv2.imread('blue.png',1), (50, 50))
+green_img = cv2.resize(cv2.imread('green.png',1), (50, 50))
+red_img = cv2.resize(cv2.imread('red.png',1), (50, 50))
+blue = [255,0,0]
+green = [0,255,0]
+red = [0,0,255]
+pen_color = blue
+
 kernel = np.ones((5,5),np.uint8)
 
 # Making window size adjustable
@@ -55,7 +63,29 @@ while(1):
     # there    
     top_left = frame[0: 50, 0: 50]
     fgmask = backgroundobject.apply(top_left)
-    
+
+
+    blue_func =  frame[70: 120, 0: 50] 
+    green_func = frame[140: 190, 0: 50] 
+    red_func = frame[210: 260, 0: 50]
+    bluemask = backgroundobject.apply(blue_func)
+    greenmask = backgroundobject.apply(green_func)
+    redmask = backgroundobject.apply(red_func)
+
+    switch_blue = np.sum(bluemask==255)
+    switch_green = np.sum(greenmask==255)
+    switch_red = np.sum(redmask==255)
+   
+    if switch_blue>background_threshold :
+        if pen_color == green or pen_color == red:
+            pen_color = blue
+    if switch_green>background_threshold :
+        if pen_color == blue or pen_color == red:
+            pen_color = green
+    if switch_red>background_threshold :
+        if pen_color == blue or pen_color == green:
+            pen_color = red
+
     # Note the number of pixels that are white, this is the level of 
     # disruption.
     switch_thresh = np.sum(fgmask==255)
@@ -72,6 +102,8 @@ while(1):
             switch = 'Eraser'
         else:
             switch = 'Pen'
+
+
 
     # Convert BGR to HSV
     hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
@@ -117,7 +149,9 @@ while(1):
             if switch == 'Pen':
                 # Draw the line on the canvas
                 canvas = cv2.line(canvas, (x1,y1),
-                (x2,y2), [255,0,0], 5)
+                # (x2,y2), [255,0,0], 5)
+                (x2,y2), pen_color, 5)
+
                 
             else:
                 cv2.circle(canvas, (x2, y2), 20,
@@ -138,6 +172,7 @@ while(1):
     else:
         # If there were no contours detected then make x1,y1 = 0
         x1,y1 =0,0
+
     
    
     # Now this piece of code is just for smooth drawing. (Optional)
@@ -148,12 +183,27 @@ while(1):
     mask = cv2.bitwise_not(mask))
     frame = cv2.add(foreground,background)
 
+    # frame2 = cv2.add(foreground,background)
+    # frame2[10: 50, 0: 50] = pen_img
+    
+    # cv2.imshow('image',frame2)
+
+
     # Switch the images depending upon what we're using, pen or eraser.
     if switch != 'Pen':
         cv2.circle(frame, (x1, y1), 20, (255,255,255), -1)
         frame[0: 50, 0: 50] = eraser_img
     else:
         frame[0: 50, 0: 50] = pen_img
+
+    frame[70: 120, 0: 50] = blue_img
+    frame[140: 190, 0: 50] = green_img
+    frame[210: 260, 0: 50] = red_img
+    
+
+
+
+
 
     cv2.imshow('image',frame)
 

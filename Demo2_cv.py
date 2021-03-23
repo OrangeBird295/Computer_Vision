@@ -11,6 +11,7 @@ cap = cv2.VideoCapture(0)
 pen_img = cv2.resize(cv2.imread('pen.png',1), (50, 50))
 eraser_img = cv2.resize(cv2.imread('eraser.png',1), (50, 50))
 
+#----------------------------------------------------------------------------------------------------
 blue_img = cv2.resize(cv2.imread('blue.png',1), (50, 50))
 green_img = cv2.resize(cv2.imread('green.png',1), (50, 50))
 red_img = cv2.resize(cv2.imread('red.png',1), (50, 50))
@@ -18,7 +19,7 @@ blue = [255,0,0]
 green = [0,255,0]
 red = [0,0,255]
 pen_color = blue
-
+#----------------------------------------------------------------------------------------------------
 kernel = np.ones((5,5),np.uint8)
 
 # Making window size adjustable
@@ -64,7 +65,7 @@ while(1):
     top_left = frame[0: 50, 0: 50]
     fgmask = backgroundobject.apply(top_left)
 
-
+#----------------------------------------------------------------------------------------------------
     blue_func =  frame[70: 120, 0: 50] 
     green_func = frame[140: 190, 0: 50] 
     red_func = frame[210: 260, 0: 50]
@@ -85,6 +86,9 @@ while(1):
     if switch_red>background_threshold :
         if pen_color == blue or pen_color == green:
             pen_color = red
+#----------------------------------------------------------------------------------------------------
+
+
 
     # Note the number of pixels that are white, this is the level of 
     # disruption.
@@ -196,10 +200,13 @@ while(1):
     else:
         frame[0: 50, 0: 50] = pen_img
 
+    #----------------------------------------------------------------------------------------------------
+
     frame[70: 120, 0: 50] = blue_img
     frame[140: 190, 0: 50] = green_img
     frame[210: 260, 0: 50] = red_img
-    
+    #----------------------------------------------------------------------------------------------------
+
 
 
 

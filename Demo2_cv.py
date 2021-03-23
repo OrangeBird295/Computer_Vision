@@ -191,6 +191,7 @@ while(1):
         cv2.circle(frame, (x1, y1), 20, (255,255,255), -1)
         frame[0: 50, 0: 50] = eraser_img
     else:
+        cv2.circle(frame, (x1, y1), 8, pen_color, -1)
         frame[0: 50, 0: 50] = pen_img
 
     

@@ -1,3 +1,4 @@
+#freferfwfwfwfwfwwfwfwefs
 import cv2
 import numpy as np
 import time
@@ -71,6 +72,7 @@ while(1):
     greenmask = backgroundobject.apply(green_func)
     redmask = backgroundobject.apply(red_func)
 
+    #np.sum ซึ่งเป็นฟังก์ชันที่จะรวมผลบวกของ array 
     switch_blue = np.sum(bluemask==255)
     switch_green = np.sum(greenmask==255)
     switch_red = np.sum(redmask==255)
@@ -94,9 +96,9 @@ while(1):
     # object type.
     if switch_thresh>background_threshold and (time.time()-last_switch) > 1:
 
-        # Save the time of the switch. 
+        # Save the time of the switch.  # delay 1 Second.
         last_switch = time.time()
-        
+        print(" last_switch = "+ last_switch)
         if switch == 'Pen':
             switch = 'Eraser'
         else:

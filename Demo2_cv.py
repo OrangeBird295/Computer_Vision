@@ -28,7 +28,7 @@ cv2.namedWindow('image', cv2.WINDOW_NORMAL)
 # This is the canvas on which we will draw upon
 canvas = None
 
-# Create a background subtractor Object
+# Create a background subtractor Object  เป็นการลบพื้นหลัง เงา=false
 backgroundobject = cv2.createBackgroundSubtractorMOG2(detectShadows = False)
 
 # This threshold determines the amount of disruption in the background.
@@ -61,7 +61,7 @@ while(1):
         canvas = np.zeros_like(frame)
         
     # Take the top left of the frame and apply the background subtractor
-    # there    
+    # there    กรอบรูปยางลบและปากกา
     top_left = frame[0: 50, 0: 50]
     fgmask = backgroundobject.apply(top_left)
 
@@ -97,7 +97,7 @@ while(1):
     # If the disruption is greater than background threshold and there has 
     # been some time after the previous switch then you. can change the 
     # object type.
-    if switch_thresh>background_threshold and (time.time()-last_switch) > 1:
+    if switch_thresh>background_threshold  and (time.time()-last_switch) > 1:
 
         # Save the time of the switch. 
         last_switch = time.time()
@@ -148,8 +148,9 @@ while(1):
         # coordinates as x1,y1. 
         if x1 == 0 and y1 == 0:
             x1,y1= x2,y2
-            
-        else:
+
+        #cv2.circle(img, center, radius, color[, thicknes])    
+        else:  
             if switch == 'Pen':
                 # Draw the line on the canvas
                 canvas = cv2.line(canvas, (x1,y1),
@@ -180,6 +181,14 @@ while(1):
     
    
     # Now this piece of code is just for smooth drawing. (Optional)
+
+    #cv2.bitwise_and(frame,frame,mask=fgmask) คือการนำภาพระดับบิตที่ชื่อว่า frame มาทำการ AND กับ Mask ที่ชื่อว่า fgmask โดยมีหลักการว่า 0 AND กับอะไรก็จะได้ 0
+
+    #cv2.bitwise_not(fgmask) ใช้ในการสลับภาพ fgmask จาก 0 เป็น 1 จาก 1 เป็น 0 หรือ การสลับจากภาพขาวเป็นดำ จากดำเป็นขาว
+
+    #cv2.add(inv2,res)เป็นฟังก์ชันที่ใช้ในการรวมภาพที่ชื่อว่า inv2 และ res โดยการ add เป็นการกระทำการของnumpy 
+    #เป็นการบวกกันของบิตของภาพทั้งสอง โดยค่าสีในแต่ละpixelจะมีค่า0-255  ถ้าค่าที่บวกได้ต่ำกว่า 0 ให้เป็น 0 และ ถ้าค่าสูงกว่า 255 
+    # ให้เป็น 255
     _ , mask = cv2.threshold(cv2.cvtColor (canvas, cv2.COLOR_BGR2GRAY), 20, 
     255, cv2.THRESH_BINARY)
     foreground = cv2.bitwise_and(canvas, canvas, mask = mask)
@@ -198,6 +207,7 @@ while(1):
         cv2.circle(frame, (x1, y1), 20, (255,255,255), -1)
         frame[0: 50, 0: 50] = eraser_img
     else:
+        cv2.circle(frame, (x1, y1), 8, pen_color, -1)
         frame[0: 50, 0: 50] = pen_img
 
     #----------------------------------------------------------------------------------------------------

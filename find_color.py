@@ -81,6 +81,7 @@ while True:
         
         # Also save this array as penval.npy
         np.save('penval',thearray)
+        #print(penval)
         break
     
 # Release the camera & destroy the windows.    

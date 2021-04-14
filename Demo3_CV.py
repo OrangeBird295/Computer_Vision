@@ -1,6 +1,62 @@
-import cv2
 import numpy as np
+import cv2
 import time
+image_hsv = None   # global ;(
+#pixel = (20,60,80) # อันนี้คือค่าที่เขาตั้งขึ้นมามั่วๆอะ
+
+def capimg():
+    cap = cv2.VideoCapture(0, cv2.CAP_DSHOW)
+    while(True):
+        ret, frame = cap.read()
+        color = cv2.cvtColor(frame, 0)
+
+        cv2.imshow('capture img [when you ready you must pass ESC : save]',color)
+
+        key = cv2.waitKey(1)
+        if key == 27:
+            cv2.imwrite("img.jpg", frame)
+            break
+    cap.release()
+    cv2.destroyAllWindows()
+
+def pick_color(event,x,y,flags,param):
+    if event == cv2.EVENT_LBUTTONDOWN: #คลิกเม้าซ้าย
+        pixel = image_hsv[y,x]
+        print(x, y, flags, param)
+        #you might want to adjust the ranges(+-10, etc):
+        print(pixel[0], pixel[1], pixel[2])
+        upper =  np.array([179, 255, 255])
+        lower =  np.array([pixel[0], pixel[1], pixel[2]], dtype=np.int32)
+        thearray = [[179, 255, 255], 
+                    [pixel[0], pixel[1], pixel[2]]]
+        print(thearray)     
+
+        print(pixel, lower, upper)
+        np.save('penval',thearray)
+        image_mask = cv2.inRange(image_hsv,lower,upper)
+        cv2.imshow("mask",image_mask)
+
+capimg()
+
+image_src = cv2.imread("img.jpg") 
+if image_src is None:
+    print ("the image read is None............")
+cv2.imshow("bgr",image_src)
+
+## NEW ##
+cv2.namedWindow('hsv') #สร้างหร้าต่างใหม่โดยใช้ชื่อ hsv (ชื่อ, ขนาดของหน้าต่าง)
+cv2.setMouseCallback('hsv', pick_color)
+
+# now click into the hsv img , and look at values:
+image_hsv = cv2.cvtColor(image_src,cv2.COLOR_BGR2HSV)
+print(image_hsv)
+cv2.imshow("hsv",image_hsv)
+
+cv2.waitKey(0)
+cv2.destroyAllWindows()
+
+def Draw():
+   import time
 load_from_disk = True
 if load_from_disk:
     penval = np.load('penval.npy')
@@ -218,3 +274,6 @@ while(1):
         
 cv2.destroyAllWindows()
 cap.release()
+
+Draw()
+

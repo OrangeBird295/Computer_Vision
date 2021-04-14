@@ -1,6 +1,62 @@
-import cv2
 import numpy as np
+import cv2
 import time
+image_hsv = None   # global ;(
+#pixel = (20,60,80) # อันนี้คือค่าที่เขาตั้งขึ้นมามั่วๆอะ
+
+def capimg():
+    cap = cv2.VideoCapture(0, cv2.CAP_DSHOW)
+    while(True):
+        ret, frame = cap.read()
+        color = cv2.cvtColor(frame, 0)
+
+        cv2.imshow('capture img [when you ready you must pass ESC : save]',color)
+
+        key = cv2.waitKey(1)
+        if key == 27:
+            cv2.imwrite("img.jpg", frame)
+            break
+    cap.release()
+    cv2.destroyAllWindows()
+
+def pick_color(event,x,y,flags,param):
+    if event == cv2.EVENT_LBUTTONDOWN: #คลิกเม้าซ้าย
+        pixel = image_hsv[y,x]
+        print(x, y, flags, param)
+        #you might want to adjust the ranges(+-10, etc):
+        print(pixel[0], pixel[1], pixel[2])
+        upper =  np.array([179, 255, 255])
+        lower =  np.array([pixel[0], pixel[1], pixel[2]], dtype=np.int32)
+        thearray = [[179, 255, 255], 
+                    [pixel[0], pixel[1], pixel[2]]]
+        print(thearray)     
+
+        print(pixel, lower, upper)
+        np.save('penval',thearray)
+        image_mask = cv2.inRange(image_hsv,lower,upper)
+        cv2.imshow("mask",image_mask)
+
+capimg()
+
+image_src = cv2.imread("img.jpg") 
+if image_src is None:
+    print ("the image read is None............")
+cv2.imshow("bgr",image_src)
+
+## NEW ##
+cv2.namedWindow('hsv') #สร้างหร้าต่างใหม่โดยใช้ชื่อ hsv (ชื่อ, ขนาดของหน้าต่าง)
+cv2.setMouseCallback('hsv', pick_color)
+
+# now click into the hsv img , and look at values:
+image_hsv = cv2.cvtColor(image_src,cv2.COLOR_BGR2HSV)
+print(image_hsv)
+cv2.imshow("hsv",image_hsv)
+
+cv2.waitKey(0)
+cv2.destroyAllWindows()
+
+def Draw():
+   import time
 load_from_disk = True
 if load_from_disk:
     penval = np.load('penval.npy')
@@ -11,7 +67,6 @@ cap = cv2.VideoCapture(0)
 pen_img = cv2.resize(cv2.imread('pen.png',1), (50, 50))
 eraser_img = cv2.resize(cv2.imread('eraser.png',1), (50, 50))
 
-#----------------------------------------------------------------------------------------------------
 blue_img = cv2.resize(cv2.imread('blue.png',1), (50, 50))
 green_img = cv2.resize(cv2.imread('green.png',1), (50, 50))
 red_img = cv2.resize(cv2.imread('red.png',1), (50, 50))
@@ -19,7 +74,7 @@ blue = [255,0,0]
 green = [0,255,0]
 red = [0,0,255]
 pen_color = blue
-#----------------------------------------------------------------------------------------------------
+
 kernel = np.ones((5,5),np.uint8)
 
 # Making window size adjustable
@@ -64,8 +119,7 @@ while(1):
     # there    กรอบรูปยางลบและปากกา
     top_left = frame[0: 50, 0: 50]
     fgmask = backgroundobject.apply(top_left)
-
-#----------------------------------------------------------------------------------------------------
+    
     blue_func =  frame[70: 120, 0: 50] 
     green_func = frame[140: 190, 0: 50] 
     red_func = frame[210: 260, 0: 50]
@@ -87,9 +141,6 @@ while(1):
     if switch_red>background_threshold :
         if pen_color == blue or pen_color == green:
             pen_color = red
-#----------------------------------------------------------------------------------------------------
-
-
 
     # Note the number of pixels that are white, this is the level of 
     # disruption.
@@ -98,7 +149,7 @@ while(1):
     # If the disruption is greater than background threshold and there has 
     # been some time after the previous switch then you. can change the 
     # object type.
-    if switch_thresh>background_threshold  and (time.time()-last_switch) > 1:
+    if switch_thresh>background_threshold and (time.time()-last_switch) > 1:
 
         # Save the time of the switch.  # delay 1 Second.
         last_switch = time.time()
@@ -107,8 +158,6 @@ while(1):
             switch = 'Eraser'
         else:
             switch = 'Pen'
-
-
 
     # Convert BGR to HSV
     hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
@@ -156,9 +205,7 @@ while(1):
             if switch == 'Pen':
                 # Draw the line on the canvas
                 canvas = cv2.line(canvas, (x1,y1),
-                # (x2,y2), [255,0,0], 5)
                 (x2,y2), pen_color, 5)
-
                 
             else:
                 cv2.circle(canvas, (x2, y2), 20,
@@ -179,7 +226,6 @@ while(1):
     else:
         # If there were no contours detected then make x1,y1 = 0
         x1,y1 =0,0
-
     
    
     # Now this piece of code is just for smooth drawing. (Optional)
@@ -198,12 +244,6 @@ while(1):
     mask = cv2.bitwise_not(mask))
     frame = cv2.add(foreground,background)
 
-    # frame2 = cv2.add(foreground,background)
-    # frame2[10: 50, 0: 50] = pen_img
-    
-    # cv2.imshow('image',frame2)
-
-
     # Switch the images depending upon what we're using, pen or eraser.
     if switch != 'Pen':
         cv2.circle(frame, (x1, y1), 20, (255,255,255), -1)
@@ -212,19 +252,13 @@ while(1):
         cv2.circle(frame, (x1, y1), 8, pen_color, -1)
         frame[0: 50, 0: 50] = pen_img
 
-    #----------------------------------------------------------------------------------------------------
-
+    
     frame[70: 120, 0: 50] = blue_img
     frame[140: 190, 0: 50] = green_img
     frame[210: 260, 0: 50] = red_img
-    #----------------------------------------------------------------------------------------------------
 
-
-
-
-
-
-    cv2.imshow('image',frame)
+    stacked = np.hstack((canvas,frame))
+    cv2.imshow('image',cv2.resize(stacked,None,fx=1.6,fy=1.6))
 
     k = cv2.waitKey(5) & 0xFF
     if k == 27:
@@ -240,3 +274,6 @@ while(1):
         
 cv2.destroyAllWindows()
 cap.release()
+
+Draw()
+

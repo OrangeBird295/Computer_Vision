@@ -10,10 +10,10 @@ def capimg():
         ret, frame = cap.read()
         color = cv2.cvtColor(frame, 0)
 
-        cv2.imshow('capture img [when you ready you must pass ESC : save]',color)
+        cv2.imshow('capture img [when you ready you must pass S : save]',color)
 
-        key = cv2.waitKey(1)
-        if key == 27:
+        #key = cv2.waitKey(1)
+        if cv2.waitKey(33) == ord('s'):
             cv2.imwrite("img.jpg", frame)
             break
     cap.release()
@@ -22,35 +22,34 @@ def capimg():
 def pick_color(event,x,y,flags,param):
     if event == cv2.EVENT_LBUTTONDOWN: #คลิกเม้าซ้าย
         pixel = image_hsv[y,x]
-        print(x, y, flags, param)
+        print("pick_color", x, y, flags, param)
         #you might want to adjust the ranges(+-10, etc):
-        print(pixel[0], pixel[1], pixel[2])
+        print("pixel HSV", pixel[0], pixel[1], pixel[2])
         upper =  np.array([179, 255, 255])
         lower =  np.array([pixel[0], pixel[1], pixel[2]], dtype=np.int32)
-        thearray = [[179, 255, 255], 
-                    [pixel[0], pixel[1], pixel[2]]]
-        print(thearray)     
+        thearray = [upper, lower] 
+        #print("thearray", thearray)     
 
-        print(pixel, lower, upper)
+        print("loxer ->", lower, "upper ->", upper)
         np.save('penval',thearray)
         image_mask = cv2.inRange(image_hsv,lower,upper)
-        cv2.imshow("mask",image_mask)
+        cv2.imshow("MASK img  [when you ready you must pass S or ESC : save]",image_mask)
 
 capimg()
 
 image_src = cv2.imread("img.jpg") 
 if image_src is None:
     print ("the image read is None............")
-cv2.imshow("bgr",image_src)
+cv2.imshow("BGR img",image_src)
 
 ## NEW ##
-cv2.namedWindow('hsv') #สร้างหร้าต่างใหม่โดยใช้ชื่อ hsv (ชื่อ, ขนาดของหน้าต่าง)
-cv2.setMouseCallback('hsv', pick_color)
+cv2.namedWindow('HSV img') #สร้างหร้าต่างใหม่โดยใช้ชื่อ hsv (ชื่อ, ขนาดของหน้าต่าง)
+cv2.setMouseCallback('HSV img', pick_color)
 
 # now click into the hsv img , and look at values:
 image_hsv = cv2.cvtColor(image_src,cv2.COLOR_BGR2HSV)
 print(image_hsv)
-cv2.imshow("hsv",image_hsv)
+cv2.imshow("HSV img",image_hsv)
 
 cv2.waitKey(0)
 cv2.destroyAllWindows()
@@ -77,7 +76,7 @@ def Draw():
     kernel = np.ones((5,5),np.uint8)
 
     # Making window size adjustable
-    cv2.namedWindow('image', cv2.WINDOW_NORMAL)
+    cv2.namedWindow('image [when you want to exit you must pass ESC : exit]', cv2.WINDOW_NORMAL)
 
     # This is the canvas on which we will draw upon
     canvas = None
@@ -173,10 +172,10 @@ def Draw():
             lower_range  = np.array([15,206,161])
             upper_range = np.array([35,226,241])
         
-        print("Low", lower_range)
-        print("Upp", upper_range)
+        # print("Low", lower_range)
+        # print("Upp", upper_range)
         mask = cv2.inRange(hsv, lower_range, upper_range)
-        print(lower_range, upper_range)
+        #print(lower_range, upper_range)
 
         # Perform morphological operations to get rid of the noise
         mask = cv2.erode(mask,kernel,iterations = 1)
@@ -260,7 +259,7 @@ def Draw():
         frame[210: 260, 0: 50] = red_img
 
         stacked = np.hstack((canvas,frame))
-        cv2.imshow('image',cv2.resize(stacked,None,fx=1.6,fy=1.6))
+        cv2.imshow('image [when you want to exit you must pass ESC : exit]',cv2.resize(stacked,None,fx=1.6,fy=1.6))
 
         k = cv2.waitKey(5) & 0xFF
         if k == 27:

@@ -21,16 +21,24 @@ def capimg():
 
 def pick_color(event,x,y,flags,param):
     if event == cv2.EVENT_LBUTTONDOWN: #คลิกเม้าซ้าย
-        pixel = image_hsv[y,x]
-        print("pick_color", x, y, flags, param)
-        #you might want to adjust the ranges(+-10, etc):
-        print("pixel HSV", pixel[0], pixel[1], pixel[2])
-        upper =  np.array([179, 255, 255])
-        lower =  np.array([pixel[0], pixel[1], pixel[2]], dtype=np.int32)
+        #print("pick_color", x, y, flags, param)
+        pixel_0rigin = image_hsv[y,x];     
+        pixel_1 = image_hsv[y, x+1];        
+        pixel_2 = image_hsv[y-1, x+1];     
+        pixel_3 = image_hsv[y-1, x];       
+        pixel_4 = image_hsv[y-1, x-1];    
+        pixel_5 = image_hsv[y, x-1];       
+        pixel_6 = image_hsv[y+1, x-1];     
+        pixel_7 = image_hsv[y+1, x];      
+        pixel_8 = image_hsv[y+1, x+1];    
+        H = (int(pixel_0rigin[0])+int(pixel_1[0])+int(pixel_2[0])+int(pixel_3[0])+int(pixel_4[0])+int(pixel_5[0])+int(pixel_6[0])+int(pixel_7[0])+int(pixel_8[0]))/9
+        S = (int(pixel_0rigin[1])+int(pixel_1[1])+int(pixel_2[1])+int(pixel_3[1])+int(pixel_4[1])+int(pixel_5[1])+int(pixel_6[1])+int(pixel_7[1])+int(pixel_8[1]))/9
+        V = (int(pixel_0rigin[2])+int(pixel_1[2])+int(pixel_2[2])+int(pixel_3[2])+int(pixel_4[2])+int(pixel_5[2])+int(pixel_6[2])+int(pixel_7[2])+int(pixel_8[2]))/9
+        print("H->", H, "S->", S, "V->", V)
+        upper =  np.array([H+10, S+10, V+20])
+        lower =  np.array([H-10, S-10, V-20])
         thearray = [upper, lower] 
-        #print("thearray", thearray)     
-
-        print("loxer ->", lower, "upper ->", upper)
+        print(" loxer ->", lower, '\n', "upper ->", upper, '\n')
         np.save('penval',thearray)
         image_mask = cv2.inRange(image_hsv,lower,upper)
         cv2.imshow("MASK img  [when you ready you must pass S or ESC : save]",image_mask)

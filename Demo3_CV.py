@@ -39,10 +39,10 @@ def pick_color(event,x,y,flags,param):
         S = (int(pixel_0rigin[1])+int(pixel_1[1])+int(pixel_2[1])+int(pixel_3[1])+int(pixel_4[1])+int(pixel_5[1])+int(pixel_6[1])+int(pixel_7[1])+int(pixel_8[1]))/9
         V = (int(pixel_0rigin[2])+int(pixel_1[2])+int(pixel_2[2])+int(pixel_3[2])+int(pixel_4[2])+int(pixel_5[2])+int(pixel_6[2])+int(pixel_7[2])+int(pixel_8[2]))/9
         print("H->", H, "S->", S, "V->", V)
-        upper =  np.array([H+10, S+10, V+20])
-        lower =  np.array([H-10, S-10, V-20])
+        upper =  np.array([H+20, S+20, V+40])
+        lower =  np.array([H-20, S-20, V-40])
         thearray = [upper, lower] 
-        print(" loxer ->", lower, '\n', "upper ->", upper, '\n')
+        print(" lower ->", lower, '\n', "upper ->", upper, '\n')
         np.save('penval',thearray)
         image_mask = cv2.inRange(image_hsv,lower,upper)
         cv2.imshow("MASK img  [when you ready you must pass S or ESC : save]",image_mask)
@@ -112,7 +112,7 @@ def Draw():
     x1,y1=0,0
 
     # Threshold for noise
-    noiseth = 800
+    noiseth = 200
 
     # Threshold for wiper, the size of the contour must be bigger than this for # us to clear the canvas
     wiper_thresh = 40000
@@ -273,9 +273,9 @@ def Draw():
             # If there were no contours detected then make x1,y1 = 0
             if switchLine == 'Free' or switch=='Eraser':
                 x1, y1 = 0, 0
-            else :
-                if (switch=='Pen' and switchWrite=='UWrite') :
-                    x1,y1 =0,0
+           # else :
+           #     if (switch=='Pen' and switchWrite=='UWrite') :
+           #         x1,y1 =0,0
         
     
         # Now this piece of code is just for smooth drawing. (Optional)
@@ -310,10 +310,10 @@ def Draw():
 
         # frame[0:50,580:630] = red_img
 
-        if switchWrite != 'Write':
-            frame[0:50,580:630] = blue_img
-        else:
-            frame[0:50,580:630] = red_img
+        # if switchWrite != 'Write':
+        #     frame[0:50,580:630] = blue_img
+        # else:
+        #     frame[0:50,580:630] = red_img
 
         if switchLine != 'Straight':
             frame[0:50, 480:530] = blue_img

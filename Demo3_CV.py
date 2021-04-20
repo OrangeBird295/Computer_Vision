@@ -102,10 +102,12 @@ def Draw():
     # A variable which tells you if you're using a pen or an eraser.
     switch = 'Pen'
     switchWrite = "Write"
+    switchLine = 'Straight'
 
     # With this variable we will monitor the time between previous switch.
     last_switch = time.time()
     last_switch_2 = time.time()
+    last_switch_line = time.time()
     # Initilize x1,y1 points
     x1,y1=0,0
 
@@ -134,6 +136,7 @@ def Draw():
         blue_func =  frame[0: 50,100: 150]
         green_func =  frame[0: 50,200: 250]
         red_func = frame[0: 50, 300: 350]
+        line_func = frame[0:50,480:530]
         write_func = frame[0:50,580:630]
 
 
@@ -142,12 +145,14 @@ def Draw():
         bluemask = backgroundobject.apply(blue_func)
         greenmask = backgroundobject.apply(green_func)
         redmask = backgroundobject.apply(red_func)
+        linemask = backgroundobject.apply(line_func)
         writemask = backgroundobject.apply(write_func)
 
         #np.sum ซึ่งเป็นฟังก์ชันที่จะรวมผลบวกของ array 
         switch_blue = np.sum(bluemask==255)
         switch_green = np.sum(greenmask==255)
-        switch_red = np.sum(redmask==255)
+        switch_red = np.sum(redmask == 255)
+        switch_line = np.sum(linemask == 255)
         switch_write = np.sum(writemask==255)
     
         if switch_blue>background_threshold :
@@ -177,7 +182,7 @@ def Draw():
             else:
                 switch = 'Pen'
 
-        if switch_write>background_threshold and (time.time()-last_switch) > 1:
+        if switch_write>background_threshold and (time.time()-last_switch_2) > 1:
 
             # Save the time of the switch.  # delay 1 Second.
             last_switch_2 = time.time()
@@ -186,6 +191,16 @@ def Draw():
                 switchWrite = 'UWrite'
             else:
                 switchWrite = 'Write'
+
+        if switch_line>background_threshold and (time.time()-last_switch_line) > 1:
+    
+            # Save the time of the switch.  # delay 1 Second.
+            last_switch_line = time.time()
+            #print(" last_switch = "+ last_switch)
+            if switchLine == 'Straight':
+                switchLine = 'Free'
+            else:
+                switchLine = 'Straight'
 
 
         # Convert BGR to HSV
@@ -254,10 +269,13 @@ def Draw():
                 cv2.putText(canvas,'Clearing Canvas',(0,200), 
                 cv2.FONT_HERSHEY_SIMPLEX, 2, (0,0,255), 1, cv2.LINE_AA)
                 clear = True 
-
-        else:
-            # If there were no contours detected then make x1,y1 = 0
-            x1,y1 =0,0
+        else : 
+            if switchLine == 'Free':
+                x1, y1 = 0, 0
+            else :
+                if (switch=='Pen' and switchWrite=='UWrite') or switch!='Pen':
+                    # If there were no contours detected then make x1,y1 = 0
+                    x1,y1 =0,0
         
     
         # Now this piece of code is just for smooth drawing. (Optional)
@@ -297,7 +315,10 @@ def Draw():
         else:
             frame[0:50,580:630] = red_img
 
-
+        if switchLine != 'Straight':
+            frame[0:50, 580:630] = blue_img
+        else:
+            frame[0:50, 580:630] = red_img
 
         stacked = np.hstack((canvas,frame))
         cv2.imshow('image [when you want to exit you must pass ESC : exit]',cv2.resize(stacked,None,fx=1.6,fy=1.6))

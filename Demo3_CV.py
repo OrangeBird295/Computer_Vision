@@ -4,6 +4,7 @@ import time
 image_hsv = None   # global ;(
 #pixel = (20,60,80) # อันนี้คือค่าที่เขาตั้งขึ้นมามั่วๆอะ
 
+# Insert picture to detect color
 def capimg():
     cap = cv2.VideoCapture(0, cv2.CAP_DSHOW)
     while(True):
@@ -13,12 +14,15 @@ def capimg():
         cv2.imshow('capture img [when you ready you must pass S : save]',color)
 
         #key = cv2.waitKey(1)
+        # Check input keyboard
         if cv2.waitKey(33) == ord('s'):
             cv2.imwrite("img.jpg", frame)
             break
     cap.release()
     cv2.destroyAllWindows()
 
+
+# Select Pen color at the beginning
 def pick_color(event,x,y,flags,param):
     if event == cv2.EVENT_LBUTTONDOWN: #คลิกเม้าซ้าย
         #print("pick_color", x, y, flags, param)
@@ -97,6 +101,7 @@ def Draw():
 
     # A variable which tells you if you're using a pen or an eraser.
     switch = 'Pen'
+    switchWrite = "Write"
 
     # With this variable we will monitor the time between previous switch.
     last_switch = time.time()
@@ -126,17 +131,24 @@ def Draw():
         top_left = frame[0: 50, 0: 50]
         fgmask = backgroundobject.apply(top_left)
         
-        blue_func =  frame[70: 120, 0: 50] 
-        green_func = frame[140: 190, 0: 50] 
-        red_func = frame[210: 260, 0: 50]
+        blue_func =  frame[0: 50,100: 150]
+        green_func =  frame[0: 50,200: 250]
+        red_func = frame[0: 50, 300: 350]
+        write_func = frame[430:480, 0:50]
+
+
+
+
         bluemask = backgroundobject.apply(blue_func)
         greenmask = backgroundobject.apply(green_func)
         redmask = backgroundobject.apply(red_func)
+        writemask = backgroundobject.apply(write_func)
 
         #np.sum ซึ่งเป็นฟังก์ชันที่จะรวมผลบวกของ array 
         switch_blue = np.sum(bluemask==255)
         switch_green = np.sum(greenmask==255)
         switch_red = np.sum(redmask==255)
+        switch_write = np.sum(writemask==255)
     
         if switch_blue>background_threshold :
             if pen_color == green or pen_color == red:
@@ -164,6 +176,17 @@ def Draw():
                 switch = 'Eraser'
             else:
                 switch = 'Pen'
+
+        if switch_write>background_threshold and (time.time()-last_switch) > 1:
+
+            # Save the time of the switch.  # delay 1 Second.
+            last_switch = time.time()
+            #print(" last_switch = "+ last_switch)
+            if switchWrite == 'Write':
+                switchWrite = 'UWrite'
+            else:
+                switchWrite = 'Write'
+
 
         # Convert BGR to HSV
         hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
@@ -262,9 +285,19 @@ def Draw():
             frame[0: 50, 0: 50] = pen_img
 
         
-        frame[70: 120, 0: 50] = blue_img
-        frame[140: 190, 0: 50] = green_img
-        frame[210: 260, 0: 50] = red_img
+        frame[0: 50,100: 150] = blue_img
+        frame[0: 50,200: 250] = green_img
+        frame[0: 50, 300: 350] = red_img
+        
+
+        # frame[430:480, 0:50] = red_img
+
+        if switchWrite != 'Write':
+            frame[430:480, 0:50] = blue_img
+        else:
+            frame[430:480, 0:50] = red_img
+
+
 
         stacked = np.hstack((canvas,frame))
         cv2.imshow('image [when you want to exit you must pass ESC : exit]',cv2.resize(stacked,None,fx=1.6,fy=1.6))

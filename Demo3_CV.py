@@ -270,11 +270,11 @@ def Draw():
                 cv2.FONT_HERSHEY_SIMPLEX, 2, (0,0,255), 1, cv2.LINE_AA)
                 clear = True 
         else : 
-            if switchLine == 'Free':
+            # If there were no contours detected then make x1,y1 = 0
+            if switchLine == 'Free' or switch=='Eraser':
                 x1, y1 = 0, 0
             else :
-                if (switch=='Pen' and switchWrite=='UWrite') or switch!='Pen':
-                    # If there were no contours detected then make x1,y1 = 0
+                if (switch=='Pen' and switchWrite=='UWrite') :
                     x1,y1 =0,0
         
     
@@ -316,9 +316,9 @@ def Draw():
             frame[0:50,580:630] = red_img
 
         if switchLine != 'Straight':
-            frame[0:50, 580:630] = blue_img
+            frame[0:50, 480:530] = blue_img
         else:
-            frame[0:50, 580:630] = red_img
+            frame[0:50, 480:530] = red_img
 
         stacked = np.hstack((canvas,frame))
         cv2.imshow('image [when you want to exit you must pass ESC : exit]',cv2.resize(stacked,None,fx=1.6,fy=1.6))

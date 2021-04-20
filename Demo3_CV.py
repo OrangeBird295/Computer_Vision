@@ -105,7 +105,7 @@ def Draw():
 
     # With this variable we will monitor the time between previous switch.
     last_switch = time.time()
-
+    last_switch_2 = time.time()
     # Initilize x1,y1 points
     x1,y1=0,0
 
@@ -134,7 +134,7 @@ def Draw():
         blue_func =  frame[0: 50,100: 150]
         green_func =  frame[0: 50,200: 250]
         red_func = frame[0: 50, 300: 350]
-        write_func = frame[430:480, 0:50]
+        write_func = frame[0:50,580:630]
 
 
 
@@ -180,7 +180,7 @@ def Draw():
         if switch_write>background_threshold and (time.time()-last_switch) > 1:
 
             # Save the time of the switch.  # delay 1 Second.
-            last_switch = time.time()
+            last_switch_2 = time.time()
             #print(" last_switch = "+ last_switch)
             if switchWrite == 'Write':
                 switchWrite = 'UWrite'
@@ -290,12 +290,12 @@ def Draw():
         frame[0: 50, 300: 350] = red_img
         
 
-        # frame[430:480, 0:50] = red_img
+        # frame[0:50,580:630] = red_img
 
         if switchWrite != 'Write':
-            frame[430:480, 0:50] = blue_img
+            frame[0:50,580:630] = blue_img
         else:
-            frame[430:480, 0:50] = red_img
+            frame[0:50,580:630] = red_img
 
 
 

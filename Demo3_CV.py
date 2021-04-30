@@ -35,12 +35,13 @@ def pick_color(event,x,y,flags,param):
         pixel_6 = image_hsv[y+1, x-1];     
         pixel_7 = image_hsv[y+1, x];      
         pixel_8 = image_hsv[y+1, x+1];    
-        H = (int(pixel_0rigin[0])+int(pixel_1[0])+int(pixel_2[0])+int(pixel_3[0])+int(pixel_4[0])+int(pixel_5[0])+int(pixel_6[0])+int(pixel_7[0])+int(pixel_8[0]))/9
-        S = (int(pixel_0rigin[1])+int(pixel_1[1])+int(pixel_2[1])+int(pixel_3[1])+int(pixel_4[1])+int(pixel_5[1])+int(pixel_6[1])+int(pixel_7[1])+int(pixel_8[1]))/9
-        V = (int(pixel_0rigin[2])+int(pixel_1[2])+int(pixel_2[2])+int(pixel_3[2])+int(pixel_4[2])+int(pixel_5[2])+int(pixel_6[2])+int(pixel_7[2])+int(pixel_8[2]))/9
-        print("H->", H, "S->", S, "V->", V)
-        upper =  np.array([H+10, S+10, V+20])
-        lower =  np.array([H-10, S-10, V-20])
+        HSV = []
+        for i in range(3):
+            result = (int(pixel_0rigin[i])+int(pixel_1[i])+int(pixel_2[i])+int(pixel_3[i])+int(pixel_4[i])+int(pixel_5[i])+int(pixel_6[i])+int(pixel_7[i])+int(pixel_8[i]))/9
+            HSV.append(result)
+        print("H->", HSV[0], "S->", HSV[1], "V->", HSV[2])
+        upper =  np.array([HSV[0]+20, HSV[1]+20, HSV[2]+40])
+        lower =  np.array([HSV[0]-20, HSV[1]-20, HSV[2]-40])
         thearray = [upper, lower] 
         print(" loxer ->", lower, '\n', "upper ->", upper, '\n')
         np.save('penval',thearray)
@@ -112,7 +113,7 @@ def Draw():
     x1,y1=0,0
 
     # Threshold for noise
-    noiseth = 800
+    noiseth = 200
 
     # Threshold for wiper, the size of the contour must be bigger than this for # us to clear the canvas
     wiper_thresh = 40000

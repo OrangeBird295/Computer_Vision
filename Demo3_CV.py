@@ -22,7 +22,7 @@ def capimg():
     cv2.destroyAllWindows()
 
 
-# Select Pen color at the beginning
+# Select Pen color at the beginning.
 def pick_color(event,x,y,flags,param):
     if event == cv2.EVENT_LBUTTONDOWN: #คลิกเม้าซ้าย
         #print("pick_color", x, y, flags, param)

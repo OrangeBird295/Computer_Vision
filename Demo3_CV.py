@@ -77,10 +77,13 @@ def Draw():
     # Load these 2 images and resize them to the same size.
     pen_img = cv2.resize(cv2.imread('pen.png',1), (50, 50))
     eraser_img = cv2.resize(cv2.imread('eraser.png',1), (50, 50))
+    curve_img = cv2.resize(cv2.imread('curve.png',1), (50, 50))
+    connected_line_img = cv2.resize(cv2.imread('line.png',1), (50, 50))
 
     blue_img = cv2.resize(cv2.imread('blue.png',1), (50, 50))
     green_img = cv2.resize(cv2.imread('green.png',1), (50, 50))
     red_img = cv2.resize(cv2.imread('red.png',1), (50, 50))
+
     blue = [255,0,0]
     green = [0,255,0]
     red = [0,0,255]
@@ -137,8 +140,9 @@ def Draw():
         blue_func =  frame[0: 50,100: 150]
         green_func =  frame[0: 50,200: 250]
         red_func = frame[0: 50, 300: 350]
-        line_func = frame[0:50,480:530]
-        write_func = frame[0:50,580:630]
+        line_func = frame[0:50,580:630]
+        # line_func = frame[0:50,480:530]
+        # write_func = frame[0:50,580:630]
 
 
 
@@ -147,14 +151,14 @@ def Draw():
         greenmask = backgroundobject.apply(green_func)
         redmask = backgroundobject.apply(red_func)
         linemask = backgroundobject.apply(line_func)
-        writemask = backgroundobject.apply(write_func)
+        # writemask = backgroundobject.apply(write_func)
 
         #np.sum ซึ่งเป็นฟังก์ชันที่จะรวมผลบวกของ array 
         switch_blue = np.sum(bluemask==255)
         switch_green = np.sum(greenmask==255)
         switch_red = np.sum(redmask == 255)
         switch_line = np.sum(linemask == 255)
-        switch_write = np.sum(writemask==255)
+        # switch_write = np.sum(writemask==255)
     
         if switch_blue>background_threshold :
             if pen_color == green or pen_color == red:
@@ -183,15 +187,15 @@ def Draw():
             else:
                 switch = 'Pen'
 
-        if switch_write>background_threshold and (time.time()-last_switch_2) > 1:
+        # if switch_write>background_threshold and (time.time()-last_switch_2) > 1:
 
-            # Save the time of the switch.  # delay 1 Second.
-            last_switch_2 = time.time()
-            #print(" last_switch = "+ last_switch)
-            if switchWrite == 'Write':
-                switchWrite = 'UWrite'
-            else:
-                switchWrite = 'Write'
+        #     # Save the time of the switch.  # delay 1 Second.
+        #     last_switch_2 = time.time()
+        #     #print(" last_switch = "+ last_switch)
+        #     if switchWrite == 'Write':
+        #         switchWrite = 'UWrite'
+        #     else:
+        #         switchWrite = 'Write'
 
         if switch_line>background_threshold and (time.time()-last_switch_line) > 1:
     
@@ -274,9 +278,9 @@ def Draw():
             # If there were no contours detected then make x1,y1 = 0
             if switchLine == 'Free' or switch=='Eraser':
                 x1, y1 = 0, 0
-            else :
-                if (switch=='Pen' and switchWrite=='UWrite') :
-                    x1,y1 =0,0
+            # else :
+            #     if (switch=='Pen' and switchWrite=='UWrite') :
+            #         x1,y1 =0,0
         
     
         # Now this piece of code is just for smooth drawing. (Optional)
@@ -311,15 +315,18 @@ def Draw():
 
         # frame[0:50,580:630] = red_img
 
-        if switchWrite != 'Write':
-            frame[0:50,580:630] = blue_img
-        else:
-            frame[0:50,580:630] = red_img
+        # if switchWrite != 'Write':
+        #     frame[0:50,580:630] = blue_img
+        # else:
+        #     frame[0:50,580:630] = red_img
 
         if switchLine != 'Straight':
-            frame[0:50, 480:530] = blue_img
+            # frame[0:50, 480:530] = connected_line_img
+            frame[0:50, 580:630] = connected_line_img
         else:
-            frame[0:50, 480:530] = red_img
+            # frame[0:50, 480:530] = curve_img
+            frame[0:50, 580:630] = curve_img
+
 
         stacked = np.hstack((canvas,frame))
         cv2.imshow('image [when you want to exit you must pass ESC : exit]',cv2.resize(stacked,None,fx=1.6,fy=1.6))

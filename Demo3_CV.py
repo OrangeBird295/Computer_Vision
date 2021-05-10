@@ -22,7 +22,7 @@ def capimg():
     cv2.destroyAllWindows()
 
 
-# Select Pen color at the beginning.
+# Select Pen color at the beginning
 def pick_color(event,x,y,flags,param):
     if event == cv2.EVENT_LBUTTONDOWN: #คลิกเม้าซ้าย
         #print("pick_color", x, y, flags, param)
@@ -116,7 +116,7 @@ def Draw():
     noiseth = 200
 
     # Threshold for wiper, the size of the contour must be bigger than this for # us to clear the canvas
-    wiper_thresh = 40000
+    wiper_thresh = 20000
 
     # A variable which tells when to clear canvas
     clear = False
